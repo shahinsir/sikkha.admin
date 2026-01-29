@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <base href="./">
+     
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="শিক্ষা এডমিন">
+    <meta name="description" content="শিক্ষা সহায়িকা কন্টেন্ট ম্যানেজমেন্ট সিস্টেম - পূর্ণাঙ্গ এডমিন অ্যাপ">
+    <meta name="keywords" content="শিক্ষা, কন্টেন্ট, এডমিন, বাংলাদেশ, বই, গাইড, PWA">
+    <title>শিক্ষা সহায়িকা এডমিন</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="https://i.ibb.co/XGNQ8V4/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/XGNQ8V4/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="https://i.ibb.co/XGNQ8V4/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://i.ibb.co/XGNQ8V4/icon-180x180.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="https://i.ibb.co/XGNQ8V4/icon-180x180.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://i.ibb.co/wFnz89n6/icon-192x192.png">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--secondary-color), #4a6491);
+            color: white;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        
+        /* Login Modal */
+        #loginModal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary-color), #4a6491);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .login-container h2 {
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .login-form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .login-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+        
+        .login-form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .login-form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        #loginError {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid #fcc;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(135deg, #2980b9, #1c5a7d);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .login-footer {
+            margin-top: 25px;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Main App Styles */
+        .admin-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            display: none; /* Hidden until login */
+        }
+        
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .header-left h1 {
+            color: var(--secondary-color);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            background: var(--light-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--secondary-color);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--success-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .status-offline {
+            background: var(--danger-color);
+        }
+        
+        .pwa-status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px 20px;
+            font-size: 13px;
+            text-align: center;
+            z-index: 9998;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .app-installed-badge {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            background: var(--success-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 9997;
+            display: none;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(39, 174, 96, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            .admin-container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), #2980b9);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #219653);
+        }
+        
+        .btn-install {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            margin-top: 20px;
+        }
+        
+        .btn-install:hover {
+            background: linear-gradient(135deg, #8e44ad, #7d3c98);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .material-type {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .material-type.book { background: #e3f2fd; color: #1976d2; }
+        .material-type.guide { background: #e8f5e9; color: #388e3c; }
+        .material-type.note { background: #fff3e0; color: #f57c00; }
+        .material-type.video { background: #f3e5f5; color: #7b1fa2; }
+        .material-type.image { background: #e0f7fa; color: #0097a7; }
+        .material-type.pdf { background: #ffebee; color: #d32f2f; }
+        .material-type.question { background: #fce4ec; color: #c2185b; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .view-btn, .edit-btn, .delete-btn, .download-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .view-btn { background: var(--success-color); color: white; }
+        .edit-btn { background: var(--warning-color); color: white; }
+        .delete-btn { background: var(--danger-color); color: white; }
+        .download-btn { background: var(--primary-color); color: white; }
+        
+        .view-btn:hover { background: #219653; }
+        .edit-btn:hover { background: #d68910; }
+        .delete-btn:hover { background: #c0392b; }
+        .download-btn:hover { background: #2980b9; }
+        
+        /* PWA Install Prompt */
+        #installPrompt {
+            display: none;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            z-index: 9999;
+            max-width: 350px;
+            animation: slideInRight 0.4s ease;
+            border: 3px solid var(--primary-color);
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        #installPrompt h4 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+        
+        #installPrompt p {
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .prompt-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .prompt-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        
+        .install-btn {
+            background: linear-gradient(135deg, var(--success-color), #219653);
+            color: white;
+        }
+        
+        .install-btn:hover {
+            background: linear-gradient(135deg, #219653, #1e8449);
+        }
+        
+        .later-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .later-btn:hover {
+            background: #7f8c8d;
+        }
+        
+        /* iOS Install Instructions */
+        #iosInstallModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .ios-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            animation: popIn 0.3s ease;
+        }
+        
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .ios-modal-content h3 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .ios-steps {
+            margin: 25px 0;
+            padding-left: 20px;
+        }
+        
+        .ios-steps li {
+            margin-bottom: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        /* Android Install Instructions */
+        #androidInstallModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .android-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            animation: popIn 0.3s ease;
+        }
+        
+        /* Custom Install Button Styles */
+        .install-button-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 15px;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .install-button-container h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .install-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .install-feature {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .install-feature span {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        /* Touch Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .btn, .view-btn, .edit-btn, .delete-btn, .logout-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            input, select, textarea, button {
+                font-size: 16px !important;
+            }
+            
+            .action-buttons {
+                gap: 10px;
+            }
+            
+            .action-buttons button {
+                padding: 12px 20px;
+                min-width: 60px;
+            }
+        }
+        
+        /* Status Messages */
+        .status-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            z-index: 9996;
+            display: none;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .status-success {
+            background: var(--success-color);
+        }
+        
+        .status-error {
+            background: var(--danger-color);
+        }
+        
+        .status-warning {
+            background: var(--warning-color);
+        }
+        
+        .status-info {
+            background: var(--primary-color);
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+        
+        .form-group select, .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group select:focus, .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        /* File Upload Styles */
+        .file-upload-container {
+            background: #f8f9fa;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-container:hover {
+            background: #e8f4fc;
+            border-color: #2980b9;
+        }
+        
+        .file-upload-container.dragover {
+            background: #d6eaf8;
+            border-color: #1abc9c;
+            transform: scale(1.02);
+        }
+        
+        .file-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .file-info {
+            background: #e8f4fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .file-size {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .upload-progress {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        /* File Management Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* File Type Badges */
+        .file-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .file-type-pdf { background: #ffebee; color: #d32f2f; }
+        .file-type-image { background: #e8f5e9; color: #388e3c; }
+        .file-type-video { background: #f3e5f5; color: #7b1fa2; }
+        .file-type-doc { background: #e3f2fd; color: #1976d2; }
+        .file-type-zip { background: #fff3e0; color: #f57c00; }
+        .file-type-other { background: #f5f5f5; color: #616161; }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10002;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: popIn 0.3s ease;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .file-viewer {
+            max-width: 100%;
+            max-height: 400px;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .file-viewer.pdf {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="login-container">
+            <h2>🔒 শিক্ষা সহায়িকা এডমিন</h2>
+            <p style="color: #666; margin-bottom: 25px; font-size: 15px;">শুধুমাত্র অনুমোদিত অ্যাডমিনদের জন্য প্রবেশ</p>
+            
+            <div id="loginError"></div>
+            
+            <div class="login-form-group">
+                <label for="adminEmail">ইমেইল এড্রেস</label>
+                <input type="email" id="adminEmail" placeholder="admin@example.com" autocomplete="email">
+            </div>
+            
+            <div class="login-form-group">
+                <label for="adminPassword">পাসওয়ার্ড</label>
+                <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            
+            <button onclick="loginAdmin()" class="login-btn">
+                🔑 লগইন করুন
+            </button>
+            
+            <div class="install-button-container" style="margin-top: 30px;">
+                <h3>📱 অ্যাপ ইনস্টল করুন</h3>
+                <div class="install-features">
+                    <div class="install-feature">✅ ফাইল আপলোড</div>
+                    <div class="install-feature">🚀 দ্রুত এক্সেস</div>
+                    <div class="install-feature">📁 ফাইল ম্যানেজ</div>
+                    <div class="install-feature">🔔 নোটিফিকেশন</div>
+                </div>
+                <button id="installButtonMain" class="btn btn-install" style="max-width: 300px; margin: 0 auto;">
+                    <span style="font-size: 24px; display: block; margin-bottom: 5px;">📱</span>
+                    <strong>অ্যাপ ইনস্টল করুন</strong>
+                    <br>
+                    <small style="font-size: 12px; opacity: 0.8;">হোম স্ক্রিনে যুক্ত করুন</small>
+                </button>
+            </div>
+            
+            <div class="login-footer">
+                <p>📱 এই অ্যাপটি PWA হিসেবে ইনস্টল করে ব্যবহার করুন</p>
+                <p style="font-size: 13px; color: #888; margin-top: 10px;">ইনস্টলের জন্য উপরের ইনস্টল বাটনে ক্লিক করুন</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PWA Status Bar -->
+    <div id="pwaStatus" class="pwa-status-bar"></div>
+    
+    <!-- App Installed Badge -->
+    <div class="app-installed-badge">📲 ইনস্টল করা</div>
+    
+    <!-- Status Messages -->
+    <div id="statusMessage" class="status-message"></div>
+    
+    <!-- File View Modal -->
+    <div id="fileViewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="fileViewTitle">ফাইল দেখুন</h3>
+                <button onclick="closeFileViewer()" class="close-modal">×</button>
+            </div>
+            <div id="fileViewContent">
+                <!-- File content will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- File Edit Modal -->
+    <div id="fileEditModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>ফাইল এডিট করুন</h3>
+                <button onclick="closeFileEditor()" class="close-modal">×</button>
+            </div>
+            <div id="fileEditContent">
+                <!-- File edit form will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main App Container -->
+    <div class="admin-container" id="adminContainer">
+        <div class="app-header">
+            <div class="header-left">
+                <h1><img src="https://i.ibb.co/wFnz89n6/icon-192x192.png" alt="আইকন" style="width: 40px; height: 40px; border-radius: 8px;"> শিক্ষা সহায়িকা এডমিন</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span id="userEmail">admin@example.com</span>
+                </div>
+                <button onclick="logoutAdmin()" class="logout-btn">🚪 লগআউট</button>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <span id="connectionStatus" class="connection-status">
+                <span id="statusIcon">🟢</span>
+                <span id="statusText">অনলাইন</span>
+            </span>
+        </div>
+        
+        <!-- File Management Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('contentTab')">📝 কন্টেন্ট ম্যানেজমেন্ট</button>
+            <button class="tab" onclick="switchTab('fileTab')">📁 ফাইল ম্যানেজমেন্ট</button>
+            <button class="tab" onclick="switchTab('uploadTab')">📤 ফাইল আপলোড</button>
+        </div>
+        
+        <!-- Content Tab (Existing) -->
+        <div id="contentTab" class="tab-content active">
+            <div class="instruction form-section">
+                <h4>📌 গুরুত্বপূর্ণ নির্দেশনা:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; margin-top: 15px;">
+                    <p>1. ক্লাস সিলেক্ট করুন (৬-১০)</p>
+                    <p>2. বিষয় সিলেক্ট করুন</p>
+                    <p>3. কন্টেন্ট টাইপ এবং টাইটেল দিন</p>
+                    <p>4. গুগল ড্রাইভ লিঙ্ক যোগ করুন</p>
+                    <p>5. ইউজার অ্যাপে স্বয়ংক্রিয়ভাবে দেখাবে</p>
+                    <p>6. 📱 অ্যাপটি ইনস্টল করুন (নিচের বাটনে)</p>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <!-- Form Section -->
+                <div class="form-section">
+                    <h3>➕ নতুন কন্টেন্ট যুক্ত করুন</h3>
+                    
+                    <div class="form-group">
+                        <label>ক্লাস নির্বাচন করুন:</label>
+                        <select id="classSelect">
+                            <option value="">-- ক্লাস সিলেক্ট করুন --</option>
+                            <option value="Class 6">Class 6 - ষষ্ঠ শ্রেণী</option>
+                            <option value="Class 7">Class 7 - সপ্তম শ্রেণী</option>
+                            <option value="Class 8">Class 8 - অষ্টম শ্রেণী</option>
+                            <option value="Class 9">Class 9 - নবম শ্রেণী</option>
+                            <option value="Class 10">Class 10 - দশম শ্রেণী</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>বিষয় নির্বাচন করুন:</label>
+                        <select id="subjectSelect">
+                            <option value="">-- বিষয় সিলেক্ট করুন --</option>
+                            <option value="math">গণিত (Mathematics)</option>
+                            <option value="english">ইংরেজি (English)</option>
+                            <option value="science">বিজ্ঞান (Science)</option>
+                            <option value="ict">তথ্য ও যোগাযোগ প্রযুক্তি (ICT)</option>
+                            <option value="agriculture">কৃষি শিক্ষা (Agriculture)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>কন্টেন্ট টাইপ:</label>
+                        <select id="typeSelect">
+                            <option value="বই">বই (Book)</option>
+                            <option value="গাইড">গাইড (Guide)</option>
+                            <option value="নোট">নোট (Note)</option>
+                            <option value="ভিডিও">ভিডিও (Video)</option>
+                            <option value="প্রশ্ন">প্রশ্ন (Question)</option>
+                            <option value="পিডিএফ">পিডিএফ (PDF)</option>
+                            <option value="ছবি">ছবি (Image)</option>
+                            <option value="MCQ">MCQ</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>শিরোনাম (Title):</label>
+                        <input type="text" id="title" placeholder="যেমন: গণিত বই, ইংরেজি গ্রামার, বিজ্ঞান নোট">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>বর্ণনা (Description):</label>
+                        <textarea id="description" rows="3" placeholder="বিস্তারিত বর্ণনা লিখুন..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>লিঙ্ক (Link):</label>
+                        <input type="text" id="link" placeholder="https://drive.google.com/file/d/XXXXX/view">
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            Google Drive, YouTube, PDF বা অন্য যেকোনো ফাইল লিঙ্ক দিন
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>লিঙ্ক টাইপ:</label>
+                        <select id="linkType">
+                            <option value="drive">Google Drive</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="pdf">PDF লিঙ্ক</option>
+                            <option value="image">ছবি লিঙ্ক</option>
+                            <option value="website">ওয়েবসাইট</option>
+                            <option value="other">অন্যান্য</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="addData()" class="btn btn-success" id="submitBtn">
+                        💾 ডেটা সেভ করুন
+                    </button>
+                </div>
+                
+                <!-- Link Guide Section -->
+                <div class="form-section">
+                    <h3>🔗 লিঙ্ক গাইড</h3>
+                    
+                    <div class="link-box" style="background: #e8f4fd; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <strong>📌 গুগল ড্রাইভ লিঙ্ক তৈরি:</strong>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 14px; color: #666;">
+                            1. ফাইল গুগল ড্রাইভে আপলোড করুন<br>
+                            2. ফাইলে রাইট-ক্লিক → "Get link"<br>
+                            3. "Anyone with the link" সিলেক্ট করুন<br>
+                            4. লিঙ্ক কপি করুন এবং এখানে পেস্ট করুন
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Display Section -->
+            <div class="form-section">
+                <h3>📋 বর্তমান কন্টেন্টসমূহ</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <div style="color: #666;">
+                        মোট: <span id="totalCount" style="font-weight: bold;">0</span>টি | 
+                        লিঙ্ক সহ: <span id="linkCount" style="font-weight: bold;">0</span>টি |
+                        অ্যাপ: <span id="appStatus" style="font-weight: bold;">ওয়েব</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <select id="filterClass" onchange="filterData()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px; min-width: 120px;">
+                            <option value="">সব ক্লাস</option>
+                            <option value="Class 6">Class 6</option>
+                            <option value="Class 7">Class 7</option>
+                            <option value="Class 8">Class 8</option>
+                            <option value="Class 9">Class 9</option>
+                            <option value="Class 10">Class 10</option>
+                        </select>
+                        
+                        <select id="filterSubject" onchange="filterData()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px; min-width: 120px;">
+                            <option value="">সব বিষয়</option>
+                            <option value="math">গণিত</option>
+                            <option value="english">ইংরেজি</option>
+                            <option value="science">বিজ্ঞান</option>
+                            <option value="ict">ICT</option>
+                            <option value="agriculture">কৃষি</option>
+                        </select>
+                        
+                        <input type="text" id="searchInput" placeholder="খুঁজুন..." onkeyup="filterData()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px; min-width: 150px;">
+                    </div>
+                </div>
+                
+                <div id="loading" style="text-align: center; padding: 40px; color: #666;">ডেটা লোড হচ্ছে...</div>
+                <div id="dataDisplay"></div>
+            </div>
+        </div>
+        
+        <!-- File Management Tab -->
+        <div id="fileTab" class="tab-content">
+            <div class="form-section">
+                <h3>📁 আপলোডকৃত ফাইলসমূহ</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalFiles">0</div>
+                        <div class="stat-label">মোট ফাইল</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalSize">0 MB</div>
+                        <div class="stat-label">মোট সাইজ</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="pdfFiles">0</div>
+                        <div class="stat-label">PDF ফাইল</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="imageFiles">0</div>
+                        <div class="stat-label">ছবি</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <div style="color: #666;">
+                        <span id="fileCount">0টি ফাইল</span> |
+                        <span id="storageUsed">0 MB ব্যবহৃত</span>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <select id="fileTypeFilter" onchange="filterFiles()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px; min-width: 120px;">
+                            <option value="">সব টাইপ</option>
+                            <option value="pdf">PDF</option>
+                            <option value="image">ছবি</option>
+                            <option value="video">ভিডিও</option>
+                            <option value="doc">ডকুমেন্ট</option>
+                            <option value="zip">জিপ ফাইল</option>
+                        </select>
+                        
+                        <input type="text" id="fileSearch" placeholder="ফাইল খুঁজুন..." onkeyup="filterFiles()" style="padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px; min-width: 150px;">
+                        
+                        <button onclick="refreshFiles()" class="btn" style="width: auto; padding: 8px 15px;">
+                            🔄 রিফ্রেশ
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="filesLoading" style="text-align: center; padding: 40px; color: #666;">ফাইল লোড হচ্ছে...</div>
+                <div id="filesDisplay"></div>
+            </div>
+        </div>
+        
+        <!-- File Upload Tab -->
+        <div id="uploadTab" class="tab-content">
+            <div class="form-section">
+                <h3>📤 নতুন ফাইল আপলোড করুন</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <div class="form-group">
+                            <label>ফাইল নির্বাচন করুন:</label>
+                            <div class="file-upload-container" id="dropArea" onclick="document.getElementById('fileInput').click()">
+                                <div style="font-size: 48px; color: var(--primary-color);">📁</div>
+                                <p style="color: #666; margin: 10px 0;">এখানে ক্লিক করুন বা ফাইল ড্রপ করুন</p>
+                                <p style="font-size: 14px; color: #888;">সাপোর্টেড: PDF, Image, Video, Word, Excel, PowerPoint, ZIP</p>
+                                <p style="font-size: 12px; color: #aaa;">ম্যাক্সিমাম সাইজ: 50MB</p>
+                            </div>
+                            <input type="file" id="fileInput" multiple style="display: none;" onchange="handleFileSelect(event)">
+                        </div>
+                        
+                        <div class="upload-progress" id="uploadProgress">
+                            <div class="progress-bar" id="progressBar"></div>
+                        </div>
+                        
+                        <div id="filePreview"></div>
+                        
+                        <div class="form-group">
+                            <label>ফাইলের নাম (বাংলা বা ইংরেজি):</label>
+                            <input type="text" id="fileName" placeholder="যেমন: গণিত বই, English Grammar, Science Note">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>বর্ণনা (ঐচ্ছিক):</label>
+                            <textarea id="fileDescription" rows="3" placeholder="ফাইলের বিস্তারিত বর্ণনা লিখুন..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label>ক্লাস নির্বাচন করুন:</label>
+                            <select id="fileClass">
+                                <option value="">-- ক্লাস সিলেক্ট করুন --</option>
+                                <option value="Class 6">Class 6 - ষষ্ঠ শ্রেণী</option>
+                                <option value="Class 7">Class 7 - সপ্তম শ্রেণী</option>
+                                <option value="Class 8">Class 8 - অষ্টম শ্রেণী</option>
+                                <option value="Class 9">Class 9 - নবম শ্রেণী</option>
+                                <option value="Class 10">Class 10 - দশম শ্রেণী</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>বিষয় নির্বাচন করুন:</label>
+                            <select id="fileSubject">
+                                <option value="">-- বিষয় সিলেক্ট করুন --</option>
+                                <option value="math">গণিত (Mathematics)</option>
+                                <option value="english">ইংরেজি (English)</option>
+                                <option value="science">বিজ্ঞান (Science)</option>
+                                <option value="ict">তথ্য ও যোগাযোগ প্রযুক্তি (ICT)</option>
+                                <option value="agriculture">কৃষি শিক্ষা (Agriculture)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>ফাইল টাইপ:</label>
+                            <select id="fileType">
+                                <option value="pdf">PDF ডকুমেন্ট</option>
+                                <option value="image">ছবি (Image)</option>
+                                <option value="video">ভিডিও (Video)</option>
+                                <option value="doc">ওয়ার্ড ডকুমেন্ট</option>
+                                <option value="excel">এক্সেল ফাইল</option>
+                                <option value="ppt">পাওয়ারপয়েন্ট</option>
+                                <option value="zip">কম্প্রেসড ফাইল (ZIP/RAR)</option>
+                                <option value="other">অন্যান্য</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>ট্যাগস (কমা দিয়ে আলাদা করুন):</label>
+                            <input type="text" id="fileTags" placeholder="যেমন: বই, গাইড, নোট, প্রশ্ন, সমাধান">
+                            <small style="color: #666;">একাধিক ট্যাগ কমা (,) দিয়ে আলাদা করুন</small>
+                        </div>
+                        
+                        <button onclick="uploadFile()" class="btn btn-success" id="uploadBtn">
+                            📤 ফাইল আপলোড করুন
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- PWA Install Button -->
+                <div class="install-button-container">
+                    <h3>📱 অ্যাপ ইনস্টল করুন</h3>
+                    <div class="install-features">
+                        <div class="install-feature"><span>📁</span> ফাইল ম্যানেজ</div>
+                        <div class="install-feature"><span>🚀</span> দ্রুত লোড</div>
+                        <div class="install-feature"><span>📶</span> অফলাইন</div>
+                        <div class="install-feature"><span>🔔</span> নোটিফিকেশন</div>
+                    </div>
+                    <button id="installButton" class="btn btn-install" style="max-width: 300px; margin: 0 auto;">
+                        <span style="font-size: 24px; display: block; margin-bottom: 5px;">📱</span>
+                        <strong>অ্যাপ ইনস্টল করুন</strong>
+                        <br>
+                        <small style="font-size: 12px; opacity: 0.8;">হোম স্ক্রিনে যুক্ত করুন</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="installPrompt">
+        <h4>📱 শিক্ষা সহায়িকা অ্যাপ</h4>
+        <p>এই অ্যাপটিকে ইনস্টল করুন এবং পূর্ণাঙ্গ মোবাইল অ্যাপের মতো ব্যবহার করুন:</p>
+        <ul style="text-align: left; color: #555; margin: 15px 0; padding-left: 20px; font-size: 14px;">
+            <li>হোম স্ক্রিনে আইকন যুক্ত হবে</li>
+            <li>ফুলস্ক্রিন মোডে চালু হবে</li>
+            <li>অফলাইনেও ব্যবহার করতে পারবেন</li>
+            <li>দ্রুত এক্সেস পাবেন</li>
+            <li>নোটিফিকেশন পাবেন</li>
+        </ul>
+        <div class="prompt-buttons">
+            <button onclick="installApp()" class="install-btn">ইনস্টল করুন</button>
+            <button onclick="hideInstallPrompt()" class="later-btn">পরে</button>
+        </div>
+    </div>
+
+    <!-- iOS Install Instructions Modal -->
+    <div id="iosInstallModal">
+        <div class="ios-modal-content">
+            <h3>📱 iOS-এ অ্যাপ ইনস্টল করুন</h3>
+            <p style="color: #666; margin-bottom: 20px; text-align: center;">
+                iOS ডিভাইসে এই অ্যাপ ইনস্টল করতে নিচের স্টেপগুলো ফলো করুন:
+            </p>
+            
+            <ol class="ios-steps">
+                <li><strong>Safari ব্রাউজার</strong> ওপেন করুন (Chrome নয়)</li>
+                <li>এই পেজে যান: <code style="background: #f1f1f1; padding: 2px 5px; border-radius: 3px;" id="currentUrl"></code></li>
+                <li>নিচের শেয়ার আইকনে ট্যাপ করুন (বক্স থেকে বের হওয়া তীরের আইকন)</li>
+                <li>লিস্ট থেকে <strong>"Add to Home Screen"</strong> সিলেক্ট করুন</li>
+                <li>"Add" বাটনে ট্যাপ করুন</li>
+                <li>হোম স্ক্রিনে অ্যাপ আইকন দেখা যাবে</li>
+            </ol>
+            
+            <div style="background: #e8f4fd; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                <strong>💡 টিপ:</strong> Safari এর Settings → General → iPhone Storage → Website Data থেকে ওয়েবসাইট ডেটা ক্লিয়ার করতে পারেন যদি সমস্যা হয়।
+            </div>
+            
+            <button onclick="closeIOSModal()" class="btn" style="background: var(--primary-color); color: white; width: 100%;">
+                বুঝেছি, ধন্যবাদ
+            </button>
+        </div>
+    </div>
+
+    <!-- Android Install Instructions Modal -->
+    <div id="androidInstallModal">
+        <div class="android-modal-content">
+            <h3>📱 Android-এ অ্যাপ ইনস্টল করুন</h3>
+            <p style="color: #666; margin-bottom: 20px; text-align: center;">
+                Android ডিভাইসে এই অ্যাপ ইনস্টল করতে নিচের স্টেপগুলো ফলো করুন:
+            </p>
+            
+            <ol class="ios-steps">
+                <li><strong>Chrome বা Brave ব্রাউজার</strong> ওপেন করুন</li>
+                <li>এই পেজে যান: <code style="background: #f1f1f1; padding: 2px 5px; border-radius: 3px;" id="androidCurrentUrl"></code></li>
+                <li>উপরের ডটস মেনুতে ট্যাপ করুন (⋮)</li>
+                <li>লিস্ট থেকে <strong>"Install app"</strong> বা <strong>"Add to Home screen"</strong> সিলেক্ট করুন</li>
+                <li>"Install" বা "Add" বাটনে ট্যাপ করুন</li>
+                <li>হোম স্ক্রিনে অ্যাপ আইকন দেখা যাবে</li>
+            </ol>
+            
+            <div style="background: #e8f4fd; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                <strong>💡 টিপ:</strong> যদি "Install app" অপশন না দেখেন, তবে "Add to Home screen" সিলেক্ট করুন।
+            </div>
+            
+            <div class="prompt-buttons" style="margin-top: 20px;">
+                <button onclick="closeAndroidModal()" class="btn" style="background: var(--primary-color); color: white; flex: 1;">
+                    বুঝেছি
+                </button>
+                <button onclick="tryAutoInstall()" class="btn" style="background: var(--success-color); color: white; flex: 1;">
+                    স্বয়ংক্রিয় ইনস্টল
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB1vOW-DY6zIkXhPK5CRF3N8w-LzUKsvgg",
+            authDomain: "education-app-8931d.firebaseapp.com",
+            databaseURL: "https://education-app-8931d-default-rtdb.firebaseio.com",
+            projectId: "education-app-8931d",
+            storageBucket: "education-app-8931d.firebasestorage.app",
+            messagingSenderId: "667995018685",
+            appId: "1:667995018685:web:c8cdc1d432748cdc98eed4"
+        };
+
+        // ✅ Global Variables
+        let db;
+        let auth;
+        let storage;
+        let currentUser = null;
+        let currentData = [];
+        let currentFiles = [];
+        let selectedFile = null;
+        let deferredPrompt = null;
+        let isAppInstalled = false;
+
+        // ✅ Initialize Firebase
+        function initializeFirebase() {
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                auth = firebase.auth();
+                storage = firebase.storage();
+                console.log("✅ Firebase initialized successfully");
+                setupAuth();
+            } catch (error) {
+                console.error("❌ Firebase initialization error:", error);
+                showStatus("Firebase সংযোগ ব্যর্থ", "error");
+            }
+        }
+
+        // ✅ Authentication Setup
+        function setupAuth() {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is signed in
+                    currentUser = user;
+                    document.getElementById('userEmail').textContent = user.email;
+                    document.getElementById('loginModal').style.display = 'none';
+                    document.getElementById('adminContainer').style.display = 'block';
+                    document.title = "শিক্ষা এডমিন - " + user.email;
+                    
+                    // Show PWA status
+                    checkAppInstalled();
+                    
+                    // Load data
+                    loadData();
+                    loadFiles();
+                    
+                    // Check if we should show install prompt
+                    setTimeout(() => {
+                        if (!isAppInstalled && deferredPrompt) {
+                            showInstallPrompt();
+                        }
+                    }, 3000);
+                    
+                    showStatus("লগইন সফল", "success");
+                } else {
+                    // User is signed out
+                    currentUser = null;
+                    document.getElementById('loginModal').style.display = 'flex';
+                    document.getElementById('adminContainer').style.display = 'none';
+                    showStatus("লগআউট হয়েছে", "info");
+                }
+            });
+        }
+
+        // ✅ Login Function
+        function loginAdmin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+            
+            if (!email || !password) {
+                errorDiv.textContent = "ইমেইল এবং পাসওয়ার্ড দিন";
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    errorDiv.style.display = 'none';
+                    showStatus("লগইন সফল হয়েছে", "success");
+                })
+                .catch((error) => {
+                    let errorMessage = "লগইন ব্যর্থ";
+                    switch(error.code) {
+                        case 'auth/invalid-email': errorMessage = "ভুল ইমেইল ফরম্যাট"; break;
+                        case 'auth/user-disabled': errorMessage = "অ্যাকাউন্ট নিষ্ক্রিয়"; break;
+                        case 'auth/user-not-found': errorMessage = "এই ইমেইলে অ্যাকাউন্ট নেই"; break;
+                        case 'auth/wrong-password': errorMessage = "ভুল পাসওয়ার্ড"; break;
+                        case 'auth/too-many-requests': errorMessage = "অনেকবার চেষ্টা করেছেন, পরে আবার চেষ্টা করুন"; break;
+                    }
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.style.display = 'block';
+                });
+        }
+
+        // ✅ Logout Function
+        function logoutAdmin() {
+            auth.signOut()
+                .then(() => {
+                    showStatus("লগআউট সফল", "info");
+                })
+                .catch((error) => {
+                    console.error("Logout error:", error);
+                });
+        }
+
+        // ✅ Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.querySelectorAll('.tab');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Load files if file tab is selected
+            if (tabName === 'fileTab') {
+                loadFiles();
+            }
+        }
+
+        // ✅ File Upload Functions
+        let selectedFiles = [];
+        
+        function handleFileSelect(event) {
+            selectedFiles = Array.from(event.target.files);
+            displayFilePreview();
+        }
+        
+        function displayFilePreview() {
+            const previewDiv = document.getElementById('filePreview');
+            previewDiv.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'file-info';
+                fileDiv.style.marginBottom = '10px';
+                
+                const fileName = file.name;
+                const fileSize = formatFileSize(file.size);
+                const fileType = getFileType(file.type);
+                
+                fileDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${fileName}</strong>
+                            <div class="file-size">${fileSize} • ${fileType}</div>
+                        </div>
+                        <button onclick="removeFile(${index})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                            ×
+                        </button>
+                    </div>
+                `;
+                
+                previewDiv.appendChild(fileDiv);
+            });
+            
+            if (selectedFiles.length > 0) {
+                document.getElementById('fileName').value = selectedFiles[0].name.split('.')[0];
+            }
+        }
+        
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFilePreview();
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function getFileType(mimeType) {
+            if (mimeType.includes('pdf')) return 'PDF';
+            if (mimeType.includes('image')) return 'Image';
+            if (mimeType.includes('video')) return 'Video';
+            if (mimeType.includes('word') || mimeType.includes('document')) return 'Word';
+            if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'Excel';
+            if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return 'PowerPoint';
+            if (mimeType.includes('zip') || mimeType.includes('compressed')) return 'ZIP';
+            return 'Other';
+        }
+        
+        // ✅ Upload File to Firebase Storage
+        function uploadFile() {
+            if (!selectedFiles.length) {
+                showStatus("দয়া করে একটি ফাইল নির্বাচন করুন", "error");
+                return;
+            }
+            
+            const fileName = document.getElementById('fileName').value.trim();
+            const fileDescription = document.getElementById('fileDescription').value.trim();
+            const fileClass = document.getElementById('fileClass').value;
+            const fileSubject = document.getElementById('fileSubject').value;
+            const fileType = document.getElementById('fileType').value;
+            const fileTags = document.getElementById('fileTags').value;
+            
+            if (!fileName || !fileClass || !fileSubject) {
+                showStatus("ফাইলের নাম, ক্লাস এবং বিষয় পূরণ করুন", "error");
+                return;
+            }
+            
+            const file = selectedFiles[0];
+            const maxSize = 50 * 1024 * 1024; // 50MB
+            
+            if (file.size > maxSize) {
+                showStatus("ফাইল সাইজ 50MB এর কম হতে হবে", "error");
+                return;
+            }
+            
+            // Generate unique file name
+            const timestamp = Date.now();
+            const fileExt = file.name.split('.').pop();
+            const uniqueFileName = `${timestamp}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+            
+            // Create storage reference
+            const storageRef = storage.ref(`files/${uniqueFileName}`);
+            
+            // Show progress bar
+            const progressBar = document.getElementById('progressBar');
+            const uploadProgress = document.getElementById('uploadProgress');
+            uploadProgress.style.display = 'block';
+            progressBar.style.width = '0%';
+            
+            // Disable upload button
+            const uploadBtn = document.getElementById('uploadBtn');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = 'আপলোড হচ্ছে...';
+            
+            // Upload file
+            const uploadTask = storageRef.put(file);
+            
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    // Progress monitoring
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressBar.style.width = progress + '%';
+                },
+                (error) => {
+                    // Error handling
+                    console.error("Upload error:", error);
+                    showStatus("আপলোড ব্যর্থ: " + error.message, "error");
+                    uploadProgress.style.display = 'none';
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '📤 ফাইল আপলোড করুন';
+                },
+                () => {
+                    // Upload completed
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        // Save file info to database
+                        const fileData = {
+                            originalName: file.name,
+                            fileName: fileName,
+                            description: fileDescription,
+                            class: fileClass,
+                            subject: fileSubject,
+                            type: fileType,
+                            tags: fileTags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                            size: file.size,
+                            url: downloadURL,
+                            storagePath: `files/${uniqueFileName}`,
+                            uploadDate: new Date().toLocaleString('bn-BD'),
+                            timestamp: timestamp,
+                            uploadedBy: currentUser.email,
+                            mimeType: file.type,
+                            downloadCount: 0,
+                            viewCount: 0
+                        };
+                        
+                        db.ref('files').push(fileData)
+                            .then(() => {
+                                showStatus("ফাইল সফলভাবে আপলোড হয়েছে!", "success");
+                                
+                                // Reset form
+                                document.getElementById('fileName').value = '';
+                                document.getElementById('fileDescription').value = '';
+                                document.getElementById('fileTags').value = '';
+                                document.getElementById('filePreview').innerHTML = '';
+                                selectedFiles = [];
+                                document.getElementById('fileInput').value = '';
+                                
+                                // Hide progress bar
+                                uploadProgress.style.display = 'none';
+                                
+                                // Enable upload button
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = '📤 ফাইল আপলোড করুন';
+                                
+                                // Load files list
+                                loadFiles();
+                            })
+                            .catch((error) => {
+                                showStatus("ডেটা সেভ ব্যর্থ: " + error.message, "error");
+                                uploadProgress.style.display = 'none';
+                                uploadBtn.disabled = false;
+                                uploadBtn.innerHTML = '📤 ফাইল আপলোড করুন';
+                            });
+                    });
+                }
+            );
+        }
+        
+        // ✅ Load Files from Database
+        function loadFiles() {
+            if (!db) return;
+            
+            db.ref('files').orderByChild('timestamp').on('value', (snapshot) => {
+                const filesDisplay = document.getElementById('filesDisplay');
+                const filesLoading = document.getElementById('filesLoading');
+                
+                if (filesLoading) filesLoading.style.display = "none";
+                
+                if (!snapshot.exists()) {
+                    filesDisplay.innerHTML = "<p style='text-align: center; padding: 40px; color: #666;'>কোনো ফাইল পাওয়া যায়নি</p>";
+                    updateFileStats(0, 0, 0, 0, 0);
+                    return;
+                }
+                
+                currentFiles = [];
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ফাইল নাম</th>
+                                <th>ক্লাস</th>
+                                <th>বিষয়</th>
+                                <th>টাইপ</th>
+                                <th>সাইজ</th>
+                                <th>তারিখ</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                
+                let index = 1;
+                let totalSize = 0;
+                let pdfCount = 0;
+                let imageCount = 0;
+                let videoCount = 0;
+                let docCount = 0;
+                
+                snapshot.forEach((child) => {
+                    const val = child.val();
+                    const key = child.key;
+                    
+                    currentFiles.push({key, ...val});
+                    totalSize += val.size || 0;
+                    
+                    // Count by type
+                    if (val.type === 'pdf') pdfCount++;
+                    if (val.type === 'image') imageCount++;
+                    if (val.type === 'video') videoCount++;
+                    if (['doc', 'excel', 'ppt'].includes(val.type)) docCount++;
+                    
+                    const fileTypeClass = getFileTypeClass(val.type);
+                    const fileTypeBadge = getFileTypeBadge(val.type);
+                    
+                    html += `
+                        <tr>
+                            <td>${index}</td>
+                            <td>
+                                <strong>${val.fileName}</strong>
+                                ${fileTypeBadge}
+                                <div style="font-size: 12px; color: #666;">${val.originalName}</div>
+                            </td>
+                            <td>${val.class}</td>
+                            <td>${getSubjectName(val.subject)}</td>
+                            <td><span class="material-type ${fileTypeClass}">${val.type}</span></td>
+                            <td>${formatFileSize(val.size)}</td>
+                            <td>${val.uploadDate}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button onclick="viewFile('${key}')" class="view-btn">👁️</button>
+                                    <button onclick="downloadFile('${key}')" class="download-btn">📥</button>
+                                    <button onclick="editFile('${key}')" class="edit-btn">✏️</button>
+                                    <button onclick="deleteFile('${key}')" class="delete-btn">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    index++;
+                });
+                
+                html += `</tbody></table>`;
+                filesDisplay.innerHTML = html;
+                
+                // Update statistics
+                updateFileStats(currentFiles.length, totalSize, pdfCount, imageCount, videoCount + docCount);
+            });
+        }
+        
+        function getFileTypeClass(type) {
+            const types = {
+                'pdf': 'pdf',
+                'image': 'image',
+                'video': 'video',
+                'doc': 'book',
+                'excel': 'book',
+                'ppt': 'book',
+                'zip': 'other',
+                'other': 'other'
+            };
+            return types[type] || 'other';
+        }
+        
+        function getFileTypeBadge(type) {
+            const badges = {
+                'pdf': '<span class="file-type-badge file-type-pdf">PDF</span>',
+                'image': '<span class="file-type-badge file-type-image">IMG</span>',
+                'video': '<span class="file-type-badge file-type-video">VID</span>',
+                'doc': '<span class="file-type-badge file-type-doc">DOC</span>',
+                'excel': '<span class="file-type-badge file-type-doc">XLS</span>',
+                'ppt': '<span class="file-type-badge file-type-doc">PPT</span>',
+                'zip': '<span class="file-type-badge file-type-zip">ZIP</span>',
+                'other': '<span class="file-type-badge file-type-other">FILE</span>'
+            };
+            return badges[type] || badges['other'];
+        }
+        
+        function updateFileStats(total, size, pdf, image, other) {
+            document.getElementById('totalFiles').textContent = total;
+            document.getElementById('totalSize').textContent = formatFileSize(size);
+            document.getElementById('pdfFiles').textContent = pdf;
+            document.getElementById('imageFiles').textContent = image;
+            
+            document.getElementById('fileCount').textContent = total + 'টি ফাইল';
+            document.getElementById('storageUsed').textContent = formatFileSize(size) + ' ব্যবহৃত';
+        }
+        
+        // ✅ View File
+        function viewFile(key) {
+            const file = currentFiles.find(f => f.key === key);
+            if (!file) return;
+            
+            // Update view count
+            db.ref('files/' + key + '/viewCount').transaction((count) => {
+                return (count || 0) + 1;
+            });
+            
+            const modal = document.getElementById('fileViewModal');
+            const title = document.getElementById('fileViewTitle');
+            const content = document.getElementById('fileViewContent');
+            
+            title.textContent = file.fileName;
+            
+            let contentHTML = `
+                <div style="margin-bottom: 20px;">
+                    <p><strong>বর্ণনা:</strong> ${file.description || 'কোনো বর্ণনা নেই'}</p>
+                    <p><strong>ক্লাস:</strong> ${file.class}</p>
+                    <p><strong>বিষয়:</strong> ${getSubjectName(file.subject)}</p>
+                    <p><strong>টাইপ:</strong> ${file.type}</p>
+                    <p><strong>সাইজ:</strong> ${formatFileSize(file.size)}</p>
+                    <p><strong>আপলোড তারিখ:</strong> ${file.uploadDate}</p>
+                    <p><strong>আপলোড করেছেন:</strong> ${file.uploadedBy}</p>
+                    ${file.tags && file.tags.length ? `<p><strong>ট্যাগস:</strong> ${file.tags.join(', ')}</p>` : ''}
+                </div>
+                <div style="text-align: center;">
+                    <a href="${file.url}" target="_blank" class="btn" style="width: auto; margin: 10px;">
+                        🔗 সরাসরি লিঙ্ক
+                    </a>
+                    <button onclick="downloadFile('${key}')" class="btn" style="width: auto; margin: 10px; background: var(--success-color);">
+                        📥 ডাউনলোড করুন
+                    </button>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">`;
+            
+            if (file.type === 'pdf') {
+                contentHTML += `
+                    <iframe src="${file.url}" class="file-viewer pdf" frameborder="0"></iframe>
+                    <p style="color: #666; margin-top: 10px;">PDF ভিউয়ার লোড হচ্ছে...</p>
+                `;
+            } else if (file.type === 'image') {
+                contentHTML += `
+                    <img src="${file.url}" alt="${file.fileName}" class="file-viewer">
+                `;
+            } else if (file.type === 'video') {
+                contentHTML += `
+                    <video controls class="file-viewer">
+                        <source src="${file.url}" type="${file.mimeType || 'video/mp4'}">
+                        আপনার ব্রাউজার ভিডিও সাপোর্ট করে না।
+                    </video>
+                `;
+            } else {
+                contentHTML += `
+                    <div style="background: #f8f9fa; padding: 40px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 48px; color: #3498db;">📄</div>
+                        <h4>ফাইল প্রিভিউ</h4>
+                        <p>এই ফাইলটির প্রিভিউ দেখানো সম্ভব নয়। ডাউনলোড করে দেখুন।</p>
+                        <p style="font-size: 14px; color: #666;">ফাইল টাইপ: ${file.type.toUpperCase()}</p>
+                    </div>
+                `;
+            }
+            
+            contentHTML += `</div>`;
+            content.innerHTML = contentHTML;
+            modal.style.display = 'flex';
+        }
+        
+        // ✅ Download File
+        function downloadFile(key) {
+            const file = currentFiles.find(f => f.key === key);
+            if (!file) return;
+            
+            // Update download count
+            db.ref('files/' + key + '/downloadCount').transaction((count) => {
+                return (count || 0) + 1;
+            });
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = file.url;
+            link.download = file.fileName + '.' + file.originalName.split('.').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showStatus("ফাইল ডাউনলোড শুরু হয়েছে", "success");
+        }
+        
+        // ✅ Edit File
+        function editFile(key) {
+            const file = currentFiles.find(f => f.key === key);
+            if (!file) return;
+            
+            selectedFile = file;
+            
+            const modal = document.getElementById('fileEditModal');
+            const content = document.getElementById('fileEditContent');
+            
+            let contentHTML = `
+                <div class="form-group">
+                    <label>ফাইলের নাম:</label>
+                    <input type="text" id="editFileName" value="${file.fileName}" placeholder="ফাইলের নাম">
+                </div>
+                
+                <div class="form-group">
+                    <label>বর্ণনা:</label>
+                    <textarea id="editFileDescription" rows="3" placeholder="ফাইলের বিস্তারিত বর্ণনা">${file.description || ''}</textarea>
+                </div>
+                
+                <div class="two-column" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>ক্লাস:</label>
+                        <select id="editFileClass">
+                            <option value="Class 6" ${file.class === 'Class 6' ? 'selected' : ''}>Class 6 - ষষ্ঠ শ্রেণী</option>
+                            <option value="Class 7" ${file.class === 'Class 7' ? 'selected' : ''}>Class 7 - সপ্তম শ্রেণী</option>
+                            <option value="Class 8" ${file.class === 'Class 8' ? 'selected' : ''}>Class 8 - অষ্টম শ্রেণী</option>
+                            <option value="Class 9" ${file.class === 'Class 9' ? 'selected' : ''}>Class 9 - নবম শ্রেণী</option>
+                            <option value="Class 10" ${file.class === 'Class 10' ? 'selected' : ''}>Class 10 - দশম শ্রেণী</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>বিষয়:</label>
+                        <select id="editFileSubject">
+                            <option value="math" ${file.subject === 'math' ? 'selected' : ''}>গণিত</option>
+                            <option value="english" ${file.subject === 'english' ? 'selected' : ''}>ইংরেজি</option>
+                            <option value="science" ${file.subject === 'science' ? 'selected' : ''}>বিজ্ঞান</option>
+                            <option value="ict" ${file.subject === 'ict' ? 'selected' : ''}>ICT</option>
+                            <option value="agriculture" ${file.subject === 'agriculture' ? 'selected' : ''}>কৃষি</option>
+                            <option value="bangla" ${file.subject === 'bangla' ? 'selected' : ''}>বাংলা</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>ট্যাগস (কমা দিয়ে আলাদা করুন):</label>
+                    <input type="text" id="editFileTags" value="${file.tags ? file.tags.join(', ') : ''}" placeholder="যেমন: বই, গাইড, নোট">
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button onclick="updateFile('${key}')" class="btn btn-success" style="margin-right: 10px;">
+                        💾 আপডেট করুন
+                    </button>
+                    <button onclick="closeFileEditor()" class="btn" style="background: #95a5a6; color: white;">
+                        বাতিল করুন
+                    </button>
+                </div>
+            `;
+            
+            content.innerHTML = contentHTML;
+            modal.style.display = 'flex';
+        }
+        
+        // ✅ Update File Information
+        function updateFile(key) {
+            const fileName = document.getElementById('editFileName').value.trim();
+            const fileDescription = document.getElementById('editFileDescription').value.trim();
+            const fileClass = document.getElementById('editFileClass').value;
+            const fileSubject = document.getElementById('editFileSubject').value;
+            const fileTags = document.getElementById('editFileTags').value;
+            
+            if (!fileName || !fileClass || !fileSubject) {
+                showStatus("ফাইলের নাম, ক্লাস এবং বিষয় পূরণ করুন", "error");
+                return;
+            }
+            
+            const updatedData = {
+                fileName: fileName,
+                description: fileDescription,
+                class: fileClass,
+                subject: fileSubject,
+                tags: fileTags.split(',').map(tag => tag.trim()).filter(tag => tag),
+                lastUpdated: new Date().toLocaleString('bn-BD')
+            };
+            
+            db.ref('files/' + key).update(updatedData)
+                .then(() => {
+                    showStatus("ফাইল আপডেট সফল!", "success");
+                    closeFileEditor();
+                    loadFiles();
+                })
+                .catch((error) => {
+                    showStatus("আপডেট ব্যর্থ: " + error.message, "error");
+                });
+        }
+        
+        // ✅ Delete File
+        function deleteFile(key) {
+            const file = currentFiles.find(f => f.key === key);
+            if (!file) return;
+            
+            if (!confirm(`আপনি কি নিশ্চিত "${file.fileName}" ফাইলটি ডিলিট করতে চান?`)) {
+                return;
+            }
+            
+            // Delete from storage
+            const storageRef = storage.ref(file.storagePath);
+            storageRef.delete().then(() => {
+                // Delete from database
+                db.ref('files/' + key).remove()
+                    .then(() => {
+                        showStatus("ফাইল সফলভাবে ডিলিট হয়েছে", "success");
+                        loadFiles();
+                    })
+                    .catch((error) => {
+                        showStatus("ডিলিট ব্যর্থ: " + error.message, "error");
+                    });
+            }).catch((error) => {
+                showStatus("স্টোরেজ থেকে ডিলিট ব্যর্থ: " + error.message, "error");
+            });
+        }
+        
+        // ✅ Filter Files
+        function filterFiles() {
+            const typeFilter = document.getElementById('fileTypeFilter').value;
+            const searchFilter = document.getElementById('fileSearch').value.toLowerCase();
+            
+            const filesDisplay = document.getElementById('filesDisplay');
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ফাইল নাম</th>
+                            <th>ক্লাস</th>
+                            <th>বিষয়</th>
+                            <th>টাইপ</th>
+                            <th>সাইজ</th>
+                            <th>তারিখ</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            let index = 1;
+            let totalSize = 0;
+            let pdfCount = 0;
+            let imageCount = 0;
+            
+            currentFiles.forEach(file => {
+                if (typeFilter && file.type !== typeFilter) return;
+                if (searchFilter && !file.fileName.toLowerCase().includes(searchFilter) && 
+                    !file.originalName.toLowerCase().includes(searchFilter) &&
+                    !(file.description && file.description.toLowerCase().includes(searchFilter))) {
+                    return;
+                }
+                
+                totalSize += file.size || 0;
+                if (file.type === 'pdf') pdfCount++;
+                if (file.type === 'image') imageCount++;
+                
+                const fileTypeClass = getFileTypeClass(file.type);
+                const fileTypeBadge = getFileTypeBadge(file.type);
+                
+                html += `
+                    <tr>
+                        <td>${index}</td>
+                        <td>
+                            <strong>${file.fileName}</strong>
+                            ${fileTypeBadge}
+                            <div style="font-size: 12px; color: #666;">${file.originalName}</div>
+                        </td>
+                        <td>${file.class}</td>
+                        <td>${getSubjectName(file.subject)}</td>
+                        <td><span class="material-type ${fileTypeClass}">${file.type}</span></td>
+                        <td>${formatFileSize(file.size)}</td>
+                        <td>${file.uploadDate}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button onclick="viewFile('${file.key}')" class="view-btn">👁️</button>
+                                <button onclick="downloadFile('${file.key}')" class="download-btn">📥</button>
+                                <button onclick="editFile('${file.key}')" class="edit-btn">✏️</button>
+                                <button onclick="deleteFile('${file.key}')" class="delete-btn">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                index++;
+            });
+            
+            html += `</tbody></table>`;
+            filesDisplay.innerHTML = html || "<p style='text-align: center; padding: 40px; color: #666;'>কোনো ফাইল পাওয়া যায়নি</p>";
+            
+            document.getElementById('fileCount').textContent = (index-1) + 'টি ফাইল';
+            document.getElementById('storageUsed').textContent = formatFileSize(totalSize) + ' ব্যবহৃত';
+        }
+        
+        // ✅ Refresh Files
+        function refreshFiles() {
+            loadFiles();
+            showStatus("ফাইল লিস্ট রিফ্রেশ করা হয়েছে", "info");
+        }
+        
+        // ✅ Close Modals
+        function closeFileViewer() {
+            document.getElementById('fileViewModal').style.display = 'none';
+        }
+        
+        function closeFileEditor() {
+            document.getElementById('fileEditModal').style.display = 'none';
+            selectedFile = null;
+        }
+        
+        // ✅ PWA Functions (keep existing PWA functions)
+        function checkAppInstalled() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            isAppInstalled = isStandalone || window.navigator.standalone;
+            
+            if (isAppInstalled) {
+                document.querySelector('.app-installed-badge').style.display = 'block';
+                document.getElementById('appStatus').textContent = '📱 অ্যাপ';
+            } else {
+                document.querySelector('.app-installed-badge').style.display = 'none';
+                document.getElementById('appStatus').textContent = '🌐 ওয়েব';
+            }
+            
+            return isAppInstalled;
+        }
+        
+        // ✅ Before Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        
+        // ✅ Install App
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showStatus("অ্যাপ ইনস্টল করা হচ্ছে...", "success");
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        // ✅ Existing Functions (keep all existing functions)
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        function addData() {
+            // Keep existing addData function
+            if (!db || !currentUser) {
+                showStatus("সংযোগ নেই বা লগইন করুন", "error");
+                return;
+            }
+
+            const cls = document.getElementById('classSelect').value;
+            const subject = document.getElementById('subjectSelect').value;
+            const type = document.getElementById('typeSelect').value;
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const link = document.getElementById('link').value.trim();
+            const linkType = document.getElementById('linkType').value;
+
+            if (!cls || !subject || !type || !title) {
+                showStatus("ক্লাস, বিষয়, টাইপ এবং শিরোনাম পূরণ করুন", "error");
+                return;
+            }
+
+            let formattedLink = link;
+            if (link && !link.startsWith('http')) {
+                formattedLink = 'https://' + link;
+            }
+
+            const timestamp = Date.now();
+            const newRef = db.ref('materials').push();
+            
+            const data = {
+                class: cls,
+                subject: subject,
+                type: type,
+                title: title,
+                description: description,
+                link: formattedLink || null,
+                linkType: linkType,
+                timestamp: timestamp,
+                date: new Date().toLocaleString('bn-BD'),
+                addedBy: currentUser.email
+            };
+            
+            newRef.set(data)
+                .then(() => {
+                    showStatus("কন্টেন্ট সংরক্ষণ করা হয়েছে!", "success");
+                    document.getElementById('title').value = "";
+                    document.getElementById('description').value = "";
+                    document.getElementById('link').value = "";
+                    loadData();
+                })
+                .catch((error) => {
+                    showStatus("সংরক্ষণ ব্যর্থ: " + error.message, "error");
+                });
+        }
+        
+        function loadData() {
+            // Keep existing loadData function
+            if (!db) return;
+
+            db.ref('materials').on('value', (snapshot) => {
+                const display = document.getElementById('dataDisplay');
+                const loading = document.getElementById('loading');
+                
+                if (loading) loading.style.display = "none";
+                
+                if (!snapshot.exists()) {
+                    display.innerHTML = "<p style='text-align: center; padding: 40px; color: #666;'>কোনো কন্টেন্ট পাওয়া যায়নি</p>";
+                    updateCounts(0, 0);
+                    return;
+                }
+
+                currentData = [];
+                let html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>শিরোনাম</th>
+                                <th>ক্লাস</th>
+                                <th>বিষয়</th>
+                                <th>টাইপ</th>
+                                <th>লিঙ্ক</th>
+                                <th>তারিখ</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                let index = 1;
+                let linkCount = 0;
+                
+                snapshot.forEach((child) => {
+                    const val = child.val();
+                    const key = child.key;
+                    
+                    currentData.push({key, ...val});
+                    
+                    if (val.link) linkCount++;
+                    
+                    const subjectName = getSubjectName(val.subject || '');
+                    const typeClass = getTypeClass(val.type || '');
+                    
+                    html += `
+                        <tr>
+                            <td>${index}</td>
+                            <td><strong>${val.title || 'N/A'}</strong></td>
+                            <td>${val.class || 'N/A'}</td>
+                            <td>${subjectName}</td>
+                            <td><span class="material-type ${typeClass}">${val.type || 'N/A'}</span></td>
+                            <td>${val.link ? '✅ আছে' : '❌ নেই'}</td>
+                            <td>${val.date || new Date(val.timestamp).toLocaleDateString('bn-BD')}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button onclick="viewData('${key}')" class="view-btn">👁️</button>
+                                    <button onclick="editData('${key}')" class="edit-btn">✏️</button>
+                                    <button onclick="deleteData('${key}')" class="delete-btn">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    index++;
+                });
+
+                html += `</tbody></table>`;
+                display.innerHTML = html;
+                updateCounts(index-1, linkCount);
+            });
+        }
+        
+        function getSubjectName(subjectCode) {
+            const subjects = {
+                'math': 'গণিত',
+                'english': 'ইংরেজি',
+                'science': 'বিজ্ঞান',
+                'ict': 'ICT',
+                'agriculture': 'কৃষি'
+            };
+            return subjects[subjectCode] || subjectCode;
+        }
+        
+        function getTypeClass(type) {
+            const types = {
+                'বই': 'book',
+                'গাইড': 'guide',
+                'নোট': 'note',
+                'ভিডিও': 'video',
+                'পিডিএফ': 'pdf',
+                'প্রশ্ন': 'question',
+                'ছবি': 'image',
+                'MCQ': 'question'
+            };
+            return types[type] || 'book';
+        }
+        
+        function updateCounts(total, links) {
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('linkCount').textContent = links;
+        }
+        
+        function viewData(key) {
+            const item = currentData.find(d => d.key === key);
+            if (!item) return;
+            
+            alert(`দেখুন: ${item.title}\n\nক্লাস: ${item.class}\nবিষয়: ${getSubjectName(item.subject)}\nটাইপ: ${item.type}\n\n${item.description || 'কোনো বর্ণনা নেই'}`);
+        }
+        
+        function editData(key) {
+            const item = currentData.find(d => d.key === key);
+            if (!item) return;
+            
+            document.getElementById('classSelect').value = item.class;
+            document.getElementById('subjectSelect').value = item.subject;
+            document.getElementById('typeSelect').value = item.type;
+            document.getElementById('title').value = item.title;
+            document.getElementById('description').value = item.description || '';
+            document.getElementById('link').value = item.link || '';
+            document.getElementById('linkType').value = item.linkType || 'other';
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '✏️ আপডেট করুন';
+            submitBtn.onclick = () => updateData(key);
+            
+            showStatus(`"${item.title}" এডিট মোডে`, "warning");
+        }
+        
+        function updateData(key) {
+            if (!db) return;
+
+            const cls = document.getElementById('classSelect').value;
+            const subject = document.getElementById('subjectSelect').value;
+            const type = document.getElementById('typeSelect').value;
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const link = document.getElementById('link').value.trim();
+            const linkType = document.getElementById('linkType').value;
+
+            if (!cls || !subject || !type || !title) {
+                showStatus("সব ফিল্ড পূরণ করুন", "error");
+                return;
+            }
+
+            let formattedLink = link;
+            if (link && !link.startsWith('http')) {
+                formattedLink = 'https://' + link;
+            }
+
+            const updatedData = {
+                class: cls,
+                subject: subject,
+                type: type,
+                title: title,
+                description: description,
+                link: formattedLink || null,
+                linkType: linkType
+            };
+            
+            db.ref('materials/' + key).update(updatedData)
+                .then(() => {
+                    showStatus("আপডেট সফল!", "success");
+                    
+                    document.getElementById('title').value = "";
+                    document.getElementById('description').value = "";
+                    document.getElementById('link').value = "";
+                    
+                    const submitBtn = document.getElementById('submitBtn');
+                    submitBtn.innerHTML = '💾 ডেটা সেভ করুন';
+                    submitBtn.onclick = addData;
+                    
+                    loadData();
+                })
+                .catch((error) => {
+                    showStatus("আপডেট ব্যর্থ", "error");
+                });
+        }
+        
+        function deleteData(key) {
+            if (!confirm("এই কন্টেন্ট ডিলিট করতে চান?")) return;
+            
+            if (!db) return;
+            
+            db.ref('materials/' + key).remove()
+                .then(() => {
+                    showStatus("ডিলিট সফল", "success");
+                    loadData();
+                })
+                .catch((error) => {
+                    showStatus("ডিলিট ব্যর্থ", "error");
+                });
+        }
+        
+        function filterData() {
+            const classFilter = document.getElementById('filterClass').value;
+            const subjectFilter = document.getElementById('filterSubject').value;
+            const searchFilter = document.getElementById('searchInput').value.toLowerCase();
+            
+            const display = document.getElementById('dataDisplay');
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>শিরোনাম</th>
+                            <th>ক্লাস</th>
+                            <th>বিষয়</th>
+                            <th>টাইপ</th>
+                            <th>লিঙ্ক</th>
+                            <th>তারিখ</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            let index = 1;
+            let linkCount = 0;
+            
+            currentData.forEach(item => {
+                if (classFilter && item.class !== classFilter) return;
+                if (subjectFilter && item.subject !== subjectFilter) return;
+                if (searchFilter && !item.title.toLowerCase().includes(searchFilter)) return;
+                
+                if (item.link) linkCount++;
+                
+                html += `
+                    <tr>
+                        <td>${index}</td>
+                        <td><strong>${item.title}</strong></td>
+                        <td>${item.class}</td>
+                        <td>${getSubjectName(item.subject)}</td>
+                        <td><span class="material-type ${getTypeClass(item.type)}">${item.type}</span></td>
+                        <td>${item.link ? '✅ আছে' : '❌ নেই'}</td>
+                        <td>${item.date || new Date(item.timestamp).toLocaleDateString('bn-BD')}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button onclick="viewData('${item.key}')" class="view-btn">👁️</button>
+                                <button onclick="editData('${item.key}')" class="edit-btn">✏️</button>
+                                <button onclick="deleteData('${item.key}')" class="delete-btn">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                index++;
+            });
+            
+            html += `</tbody></table>`;
+            display.innerHTML = html || "<p style='text-align: center; padding: 40px; color: #666;'>কোনো কন্টেন্ট পাওয়া যায়নি</p>";
+            updateCounts(index-1, linkCount);
+        }
+
+        // ✅ Initialize on Load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFirebase();
+            
+            // Drag and drop for file upload
+            const dropArea = document.getElementById('dropArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                dropArea.classList.remove('dragover');
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                selectedFiles = Array.from(files);
+                displayFilePreview();
+            }
+            
+            // Check app installed
+            checkAppInstalled();
+            
+            // Check network status
+            if (!navigator.onLine) {
+                document.getElementById('statusIcon').textContent = '🔴';
+                document.getElementById('statusText').textContent = 'অফলাইন';
+                document.getElementById('connectionStatus').classList.add('status-offline');
+            }
+        });
+    </script>
+</body>
+</html>

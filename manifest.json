@@ -1,0 +1,44 @@
+{
+  "name": "শিক্ষা সহায়িকা এডমিন",
+  "short_name": "শিক্ষা এডমিন",
+  "description": "শিক্ষা সহায়িকা কন্টেন্ট ম্যানেজমেন্ট সিস্টেম",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3498db",
+  "theme_color": "#3498db",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/wFnz89n6/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.ibb.co/XGNQ8V4/icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.ibb.co/wFnz89n6/icon-192x192.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "shortcuts": [
+    {
+      "name": "নতুন কন্টেন্ট",
+      "short_name": "যোগ করুন",
+      "description": "নতুন শিক্ষা কন্টেন্ট যোগ করুন",
+      "url": "/?new"
+    }
+  ]
+}
